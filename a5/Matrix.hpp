@@ -1,3 +1,6 @@
+// Made from the supplied Matrix.hpp
+// Changes made by Austin Abts & Ryan Job
+
 #ifndef A5_MATRIX_HPP
 #define A5_MATRIX_HPP
 
@@ -5,6 +8,75 @@
 #include <complex>
 #include <iostream>
 #include <vector>
+#include <exception>
+#include <string>
+
+class InvalidDimension : public std::exception {
+private:
+    int rows;
+    int cols;
+public:
+    InvalidDimension(int rows, int cols) {
+        InvalidDimension::rows = rows;
+        InvalidDimension::cols = cols;
+    }
+    virtual const char* what() const throw() {
+        std::string rowsS = std::to_string(rows);
+        std::string colsS = std::to_string(cols);
+        std::string out = "Invalid Dimension Exception: ";
+
+        if (rows <= 0 && cols <= 0) {
+            out += rowsS + " and " + colsS
+                + " are invalid dimensions for rows and columns respectively";
+        } else if (rows <= 0) {
+            out += rowsS + " is an invalid dimension for rows";
+        } else if (cols <= 0) {
+            out += colsS + " is an invalid dimension for cols";
+        }
+
+        return out.c_str();
+    }
+};
+
+class IndexOutOfBounds : public std::exception {
+private:
+    int index;
+public:
+    IndexOutOfBounds(int index) {
+        IndexOutOfBounds::index = index;
+    }
+    virtual const char* what() const throw() {
+        std::string out = "Index Out Of Bounds Exception: "
+            + std::to_string(index) + " is an invalid index for rows";
+        return out.c_str();
+    }
+};
+
+class IncompatibleMatrices : public std::exception {
+private:
+    std::string operation;
+    int lRows;
+    int lCols;
+    int rRows;
+    int rCols;
+public:
+    IncompatibleMatrices(std::string operation, int lRows, int lCols, 
+        int rRows, int rCols) {
+        IncompatibleMatrices::operation = operation;
+        IncompatibleMatrices::lRows = lRows;
+        IncompatibleMatrices::lCols = lCols;
+        IncompatibleMatrices::rRows = rRows;
+        IncompatibleMatrices::rCols = rCols;
+    }
+    virtual const char* what() const throw() {
+        std::string out = "Incompatible Matrices Exception: "
+            + operation + " of LHS matrix with dimensions "
+            + std::to_string(lRows) + " x " + std::to_string(lCols)
+            + " and RHS matrix with dimensions " + std::to_string(rRows)
+            + " x " + std::to_string(rCols) + " is undefined";
+        return out.c_str();
+    }
+};
 
 template<typename T>
 class Matrix {
@@ -22,6 +94,9 @@ public:
     }
 
     Matrix(int rows, int cols) {
+        if (rows <= 0 || cols <= 0) {
+            throw InvalidDimension(rows, cols);
+        }
         Matrix::rows = rows;
         Matrix::cols = cols;
         data.resize(rows);
@@ -39,14 +114,23 @@ public:
     }
 
     std::vector<T> &operator[](const int index) {
+        if (index >= rows || index < 0) {
+            throw IndexOutOfBounds(index);
+        }
         return data.at(index);
     }
 
     const std::vector<T> &operator[](const int index) const {
+        if (index >= rows || index < 0) {
+            throw IndexOutOfBounds(index);
+        }
         return data.at(index);
     }
 
     const Matrix<T> operator+(const Matrix<T> &rhs) const {
+        if (rows != rhs.getRows() || cols != rhs.getCols()) {
+            throw IncompatibleMatrices("Addition", rows, cols, rhs.getRows(), rhs.getCols());
+        }
         Matrix result(rhs.getRows(), rhs.getCols());
         for (int row = 0; row < rhs.getRows(); ++row) {
             for (int col = 0; col < rhs.getCols(); ++col) {
@@ -57,11 +141,17 @@ public:
     }
 
     Matrix<T> &operator+=(const Matrix<T> &rhs) {
+        if (rows != rhs.getRows() || cols != rhs.getCols()) {
+            throw IncompatibleMatrices("Addition", rows, cols, rhs.getRows(), rhs.getCols());
+        }
         *this = (*this) + rhs;
         return *this;
     }
 
     const Matrix<T> operator-(const Matrix<T> &rhs) const {
+        if (rows != rhs.getRows() || cols != rhs.getCols()) {
+            throw IncompatibleMatrices("Subtraction", rows, cols, rhs.getRows(), rhs.getCols());
+        }
         Matrix result(rhs.getRows(), rhs.getCols());
         for (int row = 0; row < rhs.getRows(); ++row) {
             for (int col = 0; col < rhs.getCols(); ++col) {
@@ -72,11 +162,17 @@ public:
     }
 
     Matrix<T> &operator-=(const Matrix<T> &rhs) {
+        if (rows != rhs.getRows() || cols != rhs.getCols()) {
+            throw IncompatibleMatrices("Subtraction", rows, cols, rhs.getRows(), rhs.getCols());
+        }
         *this = (*this) - rhs;
         return *this;
     }
 
     const Matrix<T> operator*(const Matrix<T> &rhs) const {
+        if (rows != rhs.getCols()) {
+            throw IncompatibleMatrices("Multiplication", rows, cols, rhs.getRows(), rhs.getCols());
+        }
         // create a matrix of dimension leftRows x rightCols
         Matrix result(this->getCols(), rhs.getCols());
         for (int row = 0; row < this->getRows(); ++row) {
@@ -90,6 +186,9 @@ public:
     }
 
     Matrix<T> &operator*=(const Matrix<T> &rhs) {
+        if (rows != rhs.getCols()) {
+            throw IncompatibleMatrices("Multiplication", rows, cols, rhs.getRows(), rhs.getCols());
+        }
         *this = (*this) * rhs;
         return *this;
     }

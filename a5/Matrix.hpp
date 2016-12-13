@@ -31,7 +31,7 @@ public:
         } else if (rows <= 0) {
             out += rowsS + " is an invalid dimension for rows";
         } else if (cols <= 0) {
-            out += colsS + " is an invalid dimension for cols";
+            out += colsS + " is an invalid dimension for columns";
         }
 
         return out.c_str();

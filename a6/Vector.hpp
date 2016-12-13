@@ -150,7 +150,9 @@ public:
      *        If there are no elements in the container, then do nothing.
      */
     void Pop_Back() {
-        size--;
+        if (size > 0) {
+            size--;
+        }
     }
 
     /**
@@ -197,10 +199,10 @@ public:
      * @throw std::out_of_range if pos >= size.
      */
     T &At(std::size_t pos) {
-        if (pos <= size) {
+        if (pos < size) {
             return elems[pos];
         } else {
-            throw std::out_of_range();
+            throw std::out_of_range("Out of range");
         }
     }
 
@@ -211,10 +213,10 @@ public:
      * @throw std::out_of_range if pos >= size.
      */
     const T &At(std::size_t pos) const {
-        if (pos <= size) {
+        if (pos < size) {
             return elems[pos];
         } else {
-            throw std::out_of_range();
+            throw std::out_of_range("Out of range");
         }
     }
 
@@ -241,11 +243,13 @@ public:
      *         If the iterator pos refers to the last element, the end() iterator is returned.
      */
     iterator Erase(iterator pos) {
-        while (pos != this.End()) {
+        iterator retVal = pos;
+        while (pos != End()) {
             *pos = *(pos + 1);
             pos++;
         }
         --size;
+        return retVal;
     }
 };
 

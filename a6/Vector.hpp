@@ -58,7 +58,15 @@ public:
      * @return A reference to the vector on the LHS.
      */
     Vector &operator=(const Vector &other) {
-        // TODO: implement this function.
+        if (this != &other) {
+            capacity = other.capacity;
+            size = other.size;
+            delete[] elems;
+            elems = new T[capacity];
+            for (int k = 0; k < capacity; ++k) {
+                elems[k] = other.elems[k];
+            }
+        }
     }
 
     /**
@@ -76,7 +84,7 @@ public:
      * @return An iterator to the first element.
      */
     iterator Begin() {
-        // TODO: implement this function.
+        return elems;
     }
 
     /**
@@ -84,7 +92,7 @@ public:
      * @return An iterator to one past the last element.
      */
     iterator End() {
-        // TODO: implement this function.
+        return elems + size;
     }
 
     /**
@@ -92,7 +100,7 @@ public:
      * @return A const iterator to the first element.
      */
     const_iterator Begin() const {
-        // TODO: implement this function.
+        return elems;
     }
 
     /**
@@ -100,7 +108,7 @@ public:
      * @return A const iterator to one past the last element.
      */
     const_iterator End() const {
-        // TODO: implement this function.
+        return elems + size;
     }
 
     /**
@@ -108,7 +116,7 @@ public:
      * @return The number of elements that can be held in currently allocated storage.
      */
     std::size_t Capacity() const {
-        // TODO: implement this function.
+        return capacity;
     }
 
     /**
@@ -116,7 +124,7 @@ public:
      * @return The number of elements in the container.
      */
     std::size_t Size() const {
-        // TODO: implement this function.
+        return size;
     }
 
     /**
@@ -125,7 +133,15 @@ public:
      * @param elem The element to be added.
      */
     void Push_Back(T elem) {
-        // TODO: implement this function.
+        if (size == capacity) {
+            capacity *= 2;
+            T *newElems = new T[capacity];
+            for (int k = 0; k < size; ++k) {
+                newElems[k] = elems[k];
+            }
+            elems = newElems;
+        }
+        elems[size++] = elem;
     }
 
     /**
@@ -134,7 +150,7 @@ public:
      *        If there are no elements in the container, then do nothing.
      */
     void Pop_Back() {
-        // TODO: implement this function.
+        size--;
     }
 
     /**
@@ -144,7 +160,14 @@ public:
      * @param new_cap new capacity of the container.
      */
     void Reserve(std::size_t new_cap) {
-        // TODO: implement this function.
+        if (new_cap > capacity) {
+            capacity = new_cap;
+            T *newelems = new T[capacity];
+            for (int k = 0; k < size; ++k) {
+                newelems[k] = elems[k];
+            }
+            elems = newelems;
+        }
     }
 
     /**
@@ -154,7 +177,7 @@ public:
      *         No bounds checking is performed.
      */
     T &operator[](std::size_t pos) {
-        // TODO: implement this function.
+        return elems[pos];
     }
 
     /**
@@ -164,7 +187,7 @@ public:
      *         No bounds checking is performed.
      */
     const T &operator[](std::size_t pos) const {
-        // TODO: implement this function.
+        return elems[pos];
     }
 
     /**
@@ -174,7 +197,11 @@ public:
      * @throw std::out_of_range if pos >= size.
      */
     T &At(std::size_t pos) {
-        // TODO: implement this function.
+        if (pos <= size) {
+            return elems[pos];
+        } else {
+            throw std::out_of_range();
+        }
     }
 
     /**
@@ -184,7 +211,11 @@ public:
      * @throw std::out_of_range if pos >= size.
      */
     const T &At(std::size_t pos) const {
-        // TODO: implement this function.
+        if (pos <= size) {
+            return elems[pos];
+        } else {
+            throw std::out_of_range();
+        }
     }
 
     /**
@@ -192,7 +223,7 @@ public:
      * @return true if the container is empty, false otherwise.
      */
     bool Empty() const {
-        // TODO: implement this function.
+        return size == 0;
     }
 
     /**
@@ -200,7 +231,7 @@ public:
      *        Leaves the capacity of the vector unchanged.
      */
     void Clear() {
-        // TODO: implement this function.
+        size = 0;
     }
 
     /**
@@ -210,7 +241,11 @@ public:
      *         If the iterator pos refers to the last element, the end() iterator is returned.
      */
     iterator Erase(iterator pos) {
-        // TODO: implement this function.
+        while (pos != this.End()) {
+            *pos = *(pos + 1);
+            pos++;
+        }
+        --size;
     }
 };
 

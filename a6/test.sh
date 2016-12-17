@@ -29,6 +29,7 @@ INCLUDE_COUNT=$(grep -o "#include" ./Vector.hpp | wc -l)
 BEGIN_COUNT=$(grep -o "/\* If you want to add methods, add them below this line \*/" ./Vector.hpp | wc -l)
 END_COUNT=$(grep -o "/\* If you want to add methods, add them above this line \*/" ./Vector.hpp | wc -l)
 PRIVATE_COUNT=$(grep -o "private" ./Vector.hpp | wc -l)
+PROTECTED_COUNT=$(grep -o "protected" ./Vector.hpp | wc -l)
 PUBLIC_COUNT=$(grep -o "public" ./Vector.hpp | wc -l)
 MUTABLE_COUNT=$(grep -o "mutable" ./Vector.hpp | wc -l)
 VOLATILE_COUNT=$(grep -o "volatile" ./Vector.hpp | wc -l)
@@ -93,6 +94,10 @@ if ((PRIVATE_COUNT > 1)); then
     (<&2 echo "There is more than 1 occurrence of the word \"private\" in Vector.hpp")
     flag=1
 fi
+if ((PROTECTED_COUNT > 0)); then
+    (<&2 echo "There are more than 0 occurrences of the word \"protected\" in Vector.hpp")
+    flag=1
+fi
 if ((PUBLIC_COUNT == 0)); then
     (<&2 echo "There are 0 occurrences of the word \"public\" in Vector.hpp")
     flag=1
@@ -118,7 +123,7 @@ fi
 cmp <(grep -v "^//" "$CODE_DIR/Vector.hpp" | head -n13) <(grep -v "^//" ./Vector.hpp | head -n13 | tr -d "\r") > /dev/null 2>&1
 status=$?
 if ((status != 0)); then
-    (<&2 echo "Warning: changes to first 13 lines of code in Vector.hpp")
+    (<&2 echo "Warning: changes to first 13 lines of code (ignoring the file comment) in Vector.hpp")
 fi
 
 # Exit if Vector.hpp does not compile

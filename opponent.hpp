@@ -19,7 +19,11 @@ public:
 };
 
 Opponent::Opponent(int difficulty) {
-	maxDepth = 3 * difficulty;
+	maxDepth = 5 * difficulty;
+
+	if (difficulty == 4) {
+		maxDepth = 69;
+	}
 }
 
 Move

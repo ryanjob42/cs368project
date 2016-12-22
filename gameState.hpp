@@ -18,7 +18,7 @@ public:
 
 	// Methods
 	int  getWinner();
-	int  isValidMove(Move move, int team, int mustHop);
+	int  isValidMove(Move move, int team, int mustHop, int dispMessage);
 	void getValidMoves(int team, std::vector<Move>& validMoves);
 	void getHopperValidMoves(int team, int row, int col, std::vector<Move>& validMoves);
 	int  applyMove(Move move);
@@ -101,22 +101,25 @@ GameState::getWinner() {
 }
 
 int
-GameState::isValidMove(Move move, int team, int mustHop) {
+GameState::isValidMove(Move move, int team, int mustHop, int dispMessage) {
 	// If any point isn't on the board, that's bad
 	if (move.startRow < 0 || move.startRow > 7 ||
 		 move.startCol < 0 || move.startCol > 7 ||
 		 move.endRow < 0 || move.endRow > 7 ||
 		 move.endCol < 0 || move.endCol > 7) {
+		if (dispMessage) std::cout << "That's not on the board!" << std::endl;
 		return 0;
 	}
 
 	// If the start point isn't owned by team, that's bad
 	if (board[move.startRow][move.startCol].team != team) {
+		if (dispMessage) std::cout << "You don't own that piece!" << std::endl;
 		return 0;
 	}
 
 	// If the endpoint isn't null, that's bad
 	if (board[move.endRow][move.endCol].team != NULLTEAM) {
+		if (dispMessage) std::cout << "That's not an empty space" << std::endl;
 		return 0;
 	}
 
@@ -124,14 +127,18 @@ GameState::isValidMove(Move move, int team, int mustHop) {
 	int colDiff = move.endCol - move.startCol;
 
 	// If it's not a king...
-	if (!board[move.endRow][move.endCol].isKing) {
+	if (!board[move.startRow][move.startCol].isKing) {
 		// If it's going the wrong way, that's bad
 		if (team == PLAYERTEAM && rowDiff >= 0) {
+			if (dispMessage) std::cout << "You can't go that way!" << std::endl;
 			return 0;
 		} else if (team == OPPONENTTEAM && rowDiff <= 0) {
+			if (dispMessage) std::cout << "AI can't go that way!" << std::endl;
 			return 0;
 		}
 	}
+
+	// Error messages from here on down are handled elsewhere
 
 	// If the move goes one space diagonally and doesn't need to hop, it's good!
 	if (rowDiff == 1 || rowDiff == -1) {
@@ -180,7 +187,7 @@ GameState::getValidMoves(int team, std::vector<Move>& validMoves) {
 					move.endCol = c + dc;
 
 					// If the move is valid, add it to the provided vector
-					if (isValidMove(move, team, 0)) {
+					if (isValidMove(move, team, 0, 0)) {
 						validMoves.emplace_back(move);
 					}
 				} // End of dc for loop
@@ -200,7 +207,7 @@ GameState::getHopperValidMoves(int team, int row, int col, std::vector<Move>& va
 			move.startCol = col;
 			move.endRow = row + dr;
 			move.endCol = col + dc;
-			if (isValidMove(move, team, 1)) {
+			if (isValidMove(move, team, 1, 0)) {
 				validMoves.emplace_back(move);
 			}
 		} // End of dc for loop

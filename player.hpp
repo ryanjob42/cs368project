@@ -40,9 +40,9 @@ Player::getMove(GameState state, Move prevMove) {
 			}
 		}
 		if (prevMove.endRow == -1) {
-			isValidMove = state.isValidMove(move, PLAYERTEAM, 0);
+			isValidMove = state.isValidMove(move, PLAYERTEAM, 0, 1);
 		} else {
-			isValidMove = state.isValidMove(move, PLAYERTEAM, 1);
+			isValidMove = state.isValidMove(move, PLAYERTEAM, 1, 1);
 		}
 
 		if (!isValidMove) {
@@ -71,8 +71,6 @@ Player::strToMove(std::string start, std::string end) {
 	if (move.endCol > 7) {
 		move.endCol -= 32;
 	}
-
-	std::cout << "Player moving from (" << move.startRow << ", " << move.startCol << ") to (" << move.endRow << ", " << move.endCol << ")" << std::endl;
 
 	return move;
 }

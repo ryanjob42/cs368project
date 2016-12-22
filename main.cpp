@@ -8,6 +8,7 @@
 
 int
 main() {
+	std::system("clear"); // Clear the console
 	int difficulty = getDifficulty();
 	std::system("clear"); // Clear the console
 	Opponent computer (difficulty);
@@ -43,9 +44,9 @@ main() {
 	}
 
 	if (board.getWinner() == PLAYERTEAM)
-		std::cout << "Carly is the queen and so are you! You did it you won yay ~" << std::endl;
+		std::cout << "You did it! You beat the computer! Yay~" << std::endl;
 	if (board.getWinner() == OPPONENTTEAM)
-		std::cout << "Your tight butt just got raped by computer. Get fukt" << std::endl;
+		std::cout << "Aww, you lost. Better luck next time!" << std::endl;
 	return 0;
 }
 
@@ -149,5 +150,7 @@ applyMove(Move move, GameState& state) {
 	state.board[killedRow][killedCol].isKing = 0;
 
 	// Return 1, saying that the person gets to go again since they hopped a piece
-	return 1;
+	std::vector<Move> validMoves;
+	state.getHopperValidMoves(oldTeam, move.endRow, move.endCol, validMoves);
+	return validMoves.size() > 0;
 } 
